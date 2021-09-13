@@ -30,13 +30,14 @@ def main():
     # (alias, full, allow_when_oneof, incompatible_with)
     cmds = [('k', 'kubectl', None, None)]
 
-    globs = [('sys', '--namespace=kube-system', None, ['sys'])]
+    globs = [] # [('sys', '--namespace=kube-system', None, ['sys'])]
 
     ops = [
         ('a', 'apply --recursive -f', None, None),
         ('ak', 'apply -k', None, ['sys']),
         ('k', 'kustomize', None, ['sys']),
         ('ex', 'exec -i -t', None, None),
+        ('ed', 'edit', None, None),
         ('lo', 'logs -f', None, None),
         ('lop', 'logs -f -p', None, None),
         ('p', 'proxy', None, ['sys']),
@@ -49,13 +50,15 @@ def main():
 
     res = [
         ('po', 'pods', ['g', 'd', 'rm'], None),
-        ('dep', 'deployment', ['g', 'd', 'rm'], None),
-        ('svc', 'service', ['g', 'd', 'rm'], None),
-        ('ing', 'ingress', ['g', 'd', 'rm'], None),
-        ('cm', 'configmap', ['g', 'd', 'rm'], None),
-        ('sec', 'secret', ['g', 'd', 'rm'], None),
-        ('no', 'nodes', ['g', 'd'], ['sys']),
-        ('ns', 'namespaces', ['g', 'd', 'rm'], ['sys']),
+        ('dep', 'deployment', ['g', 'd', 'ed', 'rm'], None),
+        ('svc', 'service', ['g', 'd', 'ed', 'rm'], None),
+        ('ing', 'ingress', ['g', 'd', 'ed', 'rm'], None),
+        ('cm', 'configmap', ['g', 'd', 'ed', 'rm'], None),
+        ('sec', 'secret', ['g', 'd', 'ed', 'rm'], None),
+        # ('no', 'nodes', ['g', 'd'], ['sys']),
+        ('ns', 'namespaces', ['g', 'd', 'ed', 'rm'], ['sys']),
+        ('pv', 'PersistentVolume', ['g', 'd', 'ed', 'rm'], ['sys']),
+        ('pvc', 'PersistentVolumeClaim', ['g', 'd', 'ed', 'rm'], ['sys']),
         ]
     res_types = [r[0] for r in res]
 
@@ -73,10 +76,17 @@ def main():
 
     # these accept a value, so they need to be at the end and
     # mutually exclusive within each other.
-    positional_args = [('f', '--recursive -f', ['g', 'd', 'rm'], res_types + ['all'
-                       , 'l', 'sys']), ('l', '-l', ['g', 'd', 'rm'], ['f',
-                       'all']), ('n', '--namespace', ['g', 'd', 'rm',
-                       'lo', 'ex', 'pf'], ['ns', 'no', 'sys', 'all'])]
+    positional_args = [
+                    ('f', '--recursive -f',
+                        ['g', 'd', 'rm'], 
+                        res_types + ['all', 'l', 'sys']),
+                        ('l', '-l',
+                            ['g', 'd', 'rm'],
+                        ['f','all']),
+                        # ('n', '--namespace',
+                        #     ['g', 'd', 'rm','lo', 'ex', 'pf'],
+                        #     ['ns', 'no', 'sys', 'all'])
+                    ]
 
     # [(part, optional, take_exactly_one)]
     parts = [
